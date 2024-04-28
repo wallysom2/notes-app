@@ -4,6 +4,7 @@ export default {
   purge: {
     content: ['./src/**/*.tsx'],
   },
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
