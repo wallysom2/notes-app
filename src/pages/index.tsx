@@ -1,8 +1,8 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import NotesPage from "~/components/Notes";
-
-import { api } from "~/utils/api";
+import GoogleSignInButton from "~/components/LoginButton";
+import { useState } from "react";
 
 export default function Home() {
   return (
@@ -17,10 +17,10 @@ export default function Home() {
       </Head>
       <main className=" flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <h1 className="fixed top-60 left-1/2 transform -translate-x-1/2 text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+          <h1 className="fixed left-1/2 top-60 -translate-x-1/2 transform text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             <span className="text-[hsl(280,100%,70%)]">Notes</span> App
           </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+          <div className="md:gap-8">
             <NotesPage />
           </div>
           <div className="flex flex-col items-center gap-2">
@@ -34,30 +34,31 @@ export default function Home() {
 
 function AuthShowcase() {
   const { data: session } = useSession();
+  const [isLogoutVisible, setIsLogoutVisible] = useState(false);
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       {session ? (
-        <div className="fixed right-4 top-4 flex items-center">
+        <div
+          className="fixed right-16 top-10 flex cursor-pointer items-center text-white"
+          onClick={() => setIsLogoutVisible(!isLogoutVisible)}
+        >
           <img
             src={session.user.image || "/default-profile.png"}
             className="mr-2 h-8 w-8 rounded-full"
           />
-          <span>{session.user.name}</span>
-          <button
-            onClick={() => signOut()}
-            className="ml-4 rounded bg-red-500 px-4 py-2 font-bold text-white"
-          >
-            Logout
-          </button>
+          <span text-white>{session.user.name}</span>
+          {isLogoutVisible && (
+            <button
+              onClick={() => signOut()}
+              className="absolute right-0 top-full mt-2 translate-y-0 transform rounded bg-red-400 px-4 py-2 font-bold text-white transition-transform"
+            >
+              Logout
+            </button>
+          )}
         </div>
       ) : (
-        <button
-          onClick={() => signIn("google")}
-          className="fixed right-4 top-4 mb-4 rounded bg-blue-500 px-4 py-2 font-bold text-white"
-        >
-          Login com Google
-        </button>
+        <GoogleSignInButton onClick={() => signIn("google")} />
       )}
     </div>
   );
