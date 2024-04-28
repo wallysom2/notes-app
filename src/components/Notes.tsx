@@ -100,7 +100,8 @@ const NotesPage: React.FC = () => {
         </button>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {notes.map((note) => (
-          <Draggable key={note.id}>
+          <Draggable key={note.id} enableUserSelectHack={false}
+          >
             <div className="flex max-w-xs cursor-grab flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20">
               <input
                 type="text"
@@ -109,8 +110,9 @@ const NotesPage: React.FC = () => {
                 onChange={(e) =>
                   updateNote(note.id, e.target.value, note.content)
                 }
-                className="mb-2 w-full bg-transparent p-0 p-4 px-0 py-0 text-lg font-bold text-white focus:outline-none"
+                className="mb-2 w-full bg-transparent p-0 p-4 px-0 py-0 text-lg font-bold text-white focus:outline-none notes"
                 autoCorrect="off"
+                onTouchStart={(e) => e.currentTarget.focus()}
               />
               <textarea
                 value={note.content}
@@ -120,6 +122,7 @@ const NotesPage: React.FC = () => {
                 }
                 className="y-full w-full resize-none border-0  bg-transparent p-0 p-4 px-0 py-0 text-white focus:outline-none"
                 autoCorrect="off"
+                onTouchStart={(e) => e.currentTarget.focus()}
               />
               <button
                 onClick={() => deleteNote(note.id)}
