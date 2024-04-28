@@ -1,49 +1,81 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Draggable from "react-draggable";
 import ButtonNewNote from "./ButtonNewNote";
+import { useRouter } from "next/router";
+import { api } from "./../utils/api";
 
 interface Note {
-  id: number;
+  id: string;
   title: string;
   content: string;
 }
 
 const NotesPage: React.FC = () => {
-  const [notes, setNotes] = useState<Note[]>([
-    { id: 0, title: "", content: "" },
-  ]);
+  const userQuery = api.note.getNotes.useQuery();
+  const updateNoteMutation = api.note.updateNote.useMutation();
+  const createNoteMutation = api.note.createNote.useMutation();
+  const deleteNoteMutation = api.note.deleteNote.useMutation();
 
-  const addNote = () => {
-    const newNote = {
-      id: Date.now(),
-      title: "",
-      content: "",
-    };
-    setNotes((prevNotes) => [...prevNotes, newNote]);
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  useEffect(() => {
+    if (userQuery.data) {
+      const showNotes = userQuery.data.map((note) => ({
+        ...note,
+      }));
+      setNotes(showNotes);
+    }
+  }, [userQuery.data]);
+
+  const addNote = (title: string, content: string) => {
+    createNoteMutation.mutate(
+      { title, content },
+      {
+        onSuccess: (newNote) => {
+          setNotes((prevNotes) => [...prevNotes, newNote]);
+        },
+      },
+    );
   };
 
-  const updateNote = (id: number, title: string, content: string) => {
-    const updatedNotes = notes.map((note) => {
-      if (note.id === id) {
-        return { ...note, title, content };
-      }
-      return note;
-    });
-    setNotes(updatedNotes);
+  const updateNote = (id: string, title: string, content: string) => {
+    updateNoteMutation.mutate(
+      { id, title, content },
+      {
+        onSuccess: (updatedNote) => {
+          setNotes(
+            notes.map((note) =>
+              note.id === updatedNote.id ? updatedNote : note,
+            ),
+          );
+        },
+      },
+    );
   };
 
-  const deleteNote = (id: number) => {
-    const updatedNotes = notes.filter((note) => note.id !== id);
-    setNotes(updatedNotes);
+  const deleteNote = (id: string) => {
+    deleteNoteMutation.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          setNotes(notes.filter((note) => note.id !== id));
+        },
+      },
+    );
   };
 
   return (
     <div className="container mx-auto p-4">
-        <ButtonNewNote addNote={addNote} />
+      <button
+        onClick={() => addNote("", "")}
+        className="mb-4 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+      >
+        Add New Note
+      </button>
       <div className="grid grid-cols-3 gap-4">
         {notes.map((note) => (
           <Draggable key={note.id}>
-            <div className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white cursor-grab hover:bg-white/20">
+            <div className="flex max-w-xs cursor-grab flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20">
               <input
                 type="text"
                 value={note.title}
@@ -51,7 +83,7 @@ const NotesPage: React.FC = () => {
                 onChange={(e) =>
                   updateNote(note.id, e.target.value, note.content)
                 }
-                className="mb-2 w-full bg-transparent p-4 text-white p-0 px-0 py-0 text-lg font-bold focus:outline-none"
+                className="mb-2 w-full bg-transparent p-0 p-4 px-0 py-0 text-lg font-bold text-white focus:outline-none"
               />
               <textarea
                 value={note.content}
@@ -59,7 +91,7 @@ const NotesPage: React.FC = () => {
                 onChange={(e) =>
                   updateNote(note.id, note.title, e.target.value)
                 }
-                className="y-full w-full resize-none border-0  bg-transparent p-4 text-white p-0 px-0 py-0 focus:outline-none"
+                className="y-full w-full resize-none border-0  bg-transparent p-0 p-4 px-0 py-0 text-white focus:outline-none"
               />
               <button
                 onClick={() => deleteNote(note.id)}
