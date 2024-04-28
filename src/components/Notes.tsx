@@ -1,7 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Draggable from "react-draggable";
-import ButtonNewNote from "./ButtonNewNote";
-import { useRouter } from "next/router";
 import { api } from "./../utils/api";
 
 interface Note {
@@ -18,16 +16,15 @@ const NotesPage: React.FC = () => {
 
   const [notes, setNotes] = useState<Note[]>([]);
 
-  useEffect(() => {
-    if (userQuery.data) {
-      const showNotes = userQuery.data.map((note) => ({
-        ...note,
-      }));
-      setNotes(showNotes);
-    }
-  }, [userQuery.data]);
+  const { data: notesData } = userQuery;
 
-  const addNote = (title: string, content: string) => {
+  useEffect(() => {
+    if (notesData) {
+      setNotes(notesData);
+    }
+  }, [notesData]);
+
+  const addNote = useCallback((title: string, content: string) => {
     createNoteMutation.mutate(
       { title, content },
       {
@@ -36,7 +33,7 @@ const NotesPage: React.FC = () => {
         },
       },
     );
-  };
+  }, [createNoteMutation]);
 
   const updateNote = (id: string, title: string, content: string) => {
     updateNoteMutation.mutate(
