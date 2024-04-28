@@ -127,6 +127,7 @@ const NotesPage: React.FC = () => {
               <button
                 onClick={() => deleteNote(note.id)}
                 className="absolute right-0 top-0 rounded bg-transparent px-2 py-1 font-bold text-white hover:bg-red-200"
+                onTouchStart={(e) => e.currentTarget.focus()}
               >
                 x
               </button>
