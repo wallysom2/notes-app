@@ -94,7 +94,7 @@ const NotesPage: React.FC = () => {
     <div className="container mx-auto p-4">
         <button
           onClick={() => addNote("", "")}
-          className=" absolute bottom-10 left-1/2 mb-3 me-3 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gradient-to-bl focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800"
+          className=" absolute bottom-12 left-1/2 mb-3 me-3 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 px-10 py-5 text-center text-sm font-medium text-white hover:bg-gradient-to-bl focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
         >
           Add New Note
         </button>
